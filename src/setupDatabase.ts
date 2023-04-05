@@ -1,17 +1,22 @@
 import mongoose from 'mongoose';
+import Logger from 'bunyan';
+
+import { config } from './config';
+
+const log: Logger = config.createLogger('setupDatabase');
 
 export default () => {
     const connect = () => {
-        mongoose.connect('mongodb://localhost:27017/social:2:0-backend')
+        mongoose.connect(`${config.DATABSE_URL}`)
             .then(() => {
-                console.log('Successfully connected to database')
+                log.info('Successfully connected to database');
             })
             .catch((error) => {
-                console.log('Error connecting database', error);
+                log.error('Error connecting database', error);
                 return process.exit(1);
             });
     };
     connect();
 
     mongoose.connection.on('disconnected', connect);
-}; 
+};
