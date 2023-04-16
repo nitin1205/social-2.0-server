@@ -12,9 +12,9 @@ import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
 import Logger from 'bunyan';
 
-import { config } from './config';
-import applicationRoutes from './routes';
-import { CustomError, IErrorResponse } from './shared/globals/helpers/error-handler';
+import { config } from '@root/config';
+import applicationRoutes from '@root/routes';
+import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
 
 const PORT = 5001;
 const log: Logger = config.createLogger('SetupServer');
@@ -85,9 +85,9 @@ export class SocialServer {
     private async startServer(app: Application): Promise<void> {
         try {
             const httpServer: http.Server = new http.Server(app);
-            // const socketIO: Server = await this.createSocketIO(httpServer);
+            const socketIO: Server = await this.createSocketIO(httpServer);
             this.startHttpServer(httpServer);
-            // this.socketIOConnections(socketIO);
+            this.socketIOConnections(socketIO);
         } catch (error) {
             log.error(error);
         }
@@ -116,5 +116,7 @@ export class SocialServer {
         });
     };
 
-    // private socketIOConnections(io: Server): void {};
+    private socketIOConnections(io: Server): void {
+      log.info('socket connection');
+    };
 };
