@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { UploadApiResponse } from 'cloudinary';
 import HTTP_STATUS from 'http-status-codes';
 import { omit } from 'lodash';
+import JWT from 'jsonwebtoken';
 
 import { joiValidation } from '@global/decorators/joi-validation-decorators';
 import { signupSchema } from '@auth/schemes/signup';
@@ -15,6 +16,7 @@ import { IUserDocument } from '@user/interfaces/user.interface';
 import { UserCache } from '@service/redis/user.cache';
 import { config } from '@root/config';
 import { authQueue } from '@service/queues/auth.queue';
+import { userQueue } from '@service/queues/user.queue';
 
 const userCache: UserCache = new UserCache();
 
@@ -51,8 +53,25 @@ export class Signup {
     // saving user information in DB
     omit(userDataForCache, ['uId', 'username', 'email', 'avatarColor', 'password']);
     authQueue.addAuthUserJob('addAuthUserToDB', { value: userDataForCache });
+    userQueue.addUserJob('addUserToDb', { value: userDataForCache });
 
-    res.status(HTTP_STATUS.CREATED).json({ message: 'User created successfully', authData });
+    const userJwt: string = Signup.prototype.signToken(authData, userObjectId);
+    req.session = {jwt: userJwt };
+
+    res.status(HTTP_STATUS.CREATED).json({ message: 'User created successfully', user: userDataForCache, token: userJwt });
+  };
+
+  private signToken(data: IAuthDocument, userObjectId: ObjectId): string {
+    return JWT.sign(
+      {
+        userId: userObjectId,
+        uId: data.uId,
+        email: data.email,
+        username: data.username,
+        avatarColor: data.avatarColor
+      },
+      config.JWT_TOKEN!
+    );
   };
 
   private signupData(data: ISignUpData): IAuthDocument {

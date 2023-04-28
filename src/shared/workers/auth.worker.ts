@@ -20,3 +20,6 @@ class AuthWorker {
     }
   };
 };
+
+
+export const authWorker: AuthWorker = new AuthWorker();
