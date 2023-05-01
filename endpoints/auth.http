@@ -27,3 +27,7 @@ withCredentials: true
   "password": "qwertyui",
 }
 
+###
+
+GET {{baseUrl}}/{{urlPath}}/signout
+
