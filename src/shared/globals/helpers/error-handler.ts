@@ -56,7 +56,7 @@ export class NotFoundError extends CustomError {
     };
 };
 
-export class NotAuthorized extends CustomError {
+export class NotAuthorizedError extends CustomError {
     statusCode = HTTP_STATUS.UNAUTHORIZED;
     status = 'error';
 
