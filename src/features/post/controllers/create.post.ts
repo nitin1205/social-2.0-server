@@ -5,6 +5,9 @@ import { ObjectId } from 'mongodb';
 import { joiValidation } from '@global/decorators/joi-validation-decorators';
 import { postSchema } from '@post/schemes/post.schemes';
 import { IPostDocument } from '@post/interfaces/post.interface';
+import { PostCache } from '@service/redis/post.cache';
+
+const postCache: PostCache = new PostCache();
 
 export class Create {
   @joiValidation(postSchema)
@@ -38,6 +41,12 @@ export class Create {
       }
     } as IPostDocument;
 
+    await postCache.savePostToCache({
+      key: postObjectId,
+      currentUserId: `${req.currentUser!.userId}`,
+      uId: `${req.currentUser!.uId}`,
+      createdPost
+    });
     res.status(HTTP_STATUS.CREATED).json({ message: 'Post created successfully' });
   };
 };

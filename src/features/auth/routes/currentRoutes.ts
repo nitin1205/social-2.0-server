@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 
 import { CurrentUser } from '@auth/controllers/current-user';
 import { authMiddleware } from '@global/helpers/auth-middleware';
@@ -8,7 +8,7 @@ class CurrentUserRoutes {
   private router: Router;
 
   constructor() {
-    this.router = Router();
+    this.router = express.Router();
   }
 
   public routes(): Router {
