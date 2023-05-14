@@ -3,8 +3,8 @@ import Logger from 'bunyan';
 import { BaseCache } from '@service/redis/base.cache';
 import { config } from '@root/config';
 import { ServerError } from '@global/helpers/error-handler';
-import { Helpers } from '@global/helpers/helpers';
-import { IUserDocument } from '@user/interfaces/user.interface';
+// import { Helpers } from '@global/helpers/helpers';
+// import { IUserDocument } from '@user/interfaces/user.interface';
 import { ISavePostToCache } from '@post/interfaces/post.interface';
 
 const log: Logger = config.createLogger('postCache');
@@ -72,5 +72,24 @@ export class PostCache extends BaseCache {
       'createdAt',
       `${createdAt}`
     ];
+
+    const dataToSave: string[] = [...firstList, ...secondList];
+
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      };
+
+      const postCount: string[] = await this.client.HMGET(`users:${currentUserId}`, 'postsCount');
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      multi.ZADD('post', { score: parseInt(uId, 10), value: `${key}`});
+      multi.HSET(`post:${key}`, dataToSave);
+      const count: number = parseInt(postCount[0], 10) + 1;
+      multi.HSET(`users:${currentUserId}`, ['postCount', count]);
+      multi.exec();
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error.Try again');
+    };
   };
 };
