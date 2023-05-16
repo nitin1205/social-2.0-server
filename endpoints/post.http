@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:5001
+
+@urlPath = api/v1
+
+
+###
+POST {{baseUrl}}/{{urlPath}}/post
+# Content-Type: application/json
+Accept: application/json,
+withCredentials: true
+
+{
+  "post": "",
+  "bgColor": "",
+  "privacy": "",
+  "gifUrl": "",
+  "ProfilePicture": "",
+  "feelings": "",
+}
+
+###
+POST {{baseUrl}}/{{urlPath}}/post/image
+# Content-Type: application/json
+Accept: application/json,
+withCredentials: true
+
+{
+  "post": "",
+  "bgColor": "",
+  "privacy": "",
+  "gifUrl": "",
+  "ProfilePicture": "",
+  "feelings": "",
+  "image": ""
+}
