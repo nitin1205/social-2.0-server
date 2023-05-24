@@ -17,6 +17,7 @@ class PostService {
     if (query?.imgId && query?.gifUrl) {
       postQuery = { $or: [{ imgId: { $ne: '' } }, { gifUrl: { $ne: '' }}] };
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       postQuery = query;
     };
     const posts: IPostDocument[] = await PostModel.aggregate([
