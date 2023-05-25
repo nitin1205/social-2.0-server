@@ -1,6 +1,6 @@
-import { UpdateQuery } from 'mongoose';
+import { Query, UpdateQuery } from 'mongoose';
 
-import { IGetPostsQuery, IPostDocument } from '@post/interfaces/post.interface';
+import { IGetPostsQuery, IPostDocument, IQueryComplete, IQueryDeleted } from '@post/interfaces/post.interface';
 import { PostModel } from '@post/models/post.schema';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { UserModel } from '@user/models/user.schema';
@@ -32,6 +32,13 @@ class PostService {
   public async postCount(): Promise<number> {
     const count: number = await PostModel.find({}).countDocuments();
     return count;
+  };
+
+  public async deletePost(postId: string, userId: string): Promise<void> {
+    const deletePost: Query<IQueryComplete & IQueryDeleted, IPostDocument> = PostModel.deleteOne({ _id: postId });
+    // const deleteReactions =
+    const decrementPostCount: UpdateQuery<IUserDocument> = UserModel.updateOne({ _id: userId }, { $inc: { postsCount: -1 } });
+    await Promise.all([deletePost, decrementPostCount]);
   };
 };
 

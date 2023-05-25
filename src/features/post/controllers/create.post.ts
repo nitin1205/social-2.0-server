@@ -14,7 +14,7 @@ import { BadRequestError } from '@global/helpers/error-handler';
 
 const postCache: PostCache = new PostCache();
 
-export class Create {
+export class CreatePost {
   @joiValidation(postSchema)
   public async post(req: Request, res: Response): Promise<void> {
     const { post, bgColor, privacy, gifUrl, profilePicture, feelings } = req.body;
