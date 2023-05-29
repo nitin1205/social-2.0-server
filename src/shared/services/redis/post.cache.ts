@@ -66,9 +66,11 @@ export class PostCache extends BaseCache {
       const postCount: string[] = await this.client.HMGET(`users:${currentUserId}`, 'postsCount');
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       multi.ZADD('post', { score: parseInt(uId, 10), value: `${key}`});
-      multi.HSET(`post:${key}`, dataToSave);
+      for (const [itemKey, itemValue] of Object.entries(dataToSave)) {
+        multi.HSET(`post:${key}`, `${itemKey}`, `${itemValue}`);
+      };
       const count: number = parseInt(postCount[0], 10) + 1;
-      multi.HSET(`users:${currentUserId}`, ['postCount', count]);
+      multi.HSET(`users:${currentUserId}`, 'postCount', count);
       multi.exec();
     } catch (error) {
       log.error(error);
@@ -199,7 +201,7 @@ export class PostCache extends BaseCache {
       multi.DEL(`comments:${key}`);
       multi.DEL(`reactions:${key}`);
       const count: number = parseInt(postCount[0], 10) - 1;
-      multi.HSET(`users:${currentUserId}`, ['postsCount', count]);
+      multi.HSET(`users:${currentUserId}`, 'postsCount', count);
       await multi.exec();
     } catch (error) {
       log.error(error);
@@ -210,25 +212,25 @@ export class PostCache extends BaseCache {
   public async updatePostInCache(key: string, updatedPost: IPostDocument): Promise<IPostDocument> {
     const { post, bgColor, feelings, privacy, gifUrl, imgVersion, imgId, profilePicture } = updatedPost;
 
-    const firstList: string[] = [
-      'post',
-      `${post}`,
-      'bgColor',
-      `${bgColor}`,
-      'feelings',
-      `${feelings}`,
-      'privacy',
-      `${privacy}`,
-      'gifUrl',
-      `${gifUrl}`
-    ];
-    const sencondList: string[] = ['profilePicture', `${profilePicture}`, 'imgVersion', `${imgVersion}`, 'imgId', `${imgId}`];
-    const dataToSave: string[] = [...firstList, ...sencondList];
+    const dataToSave = {
+      'post': `${post}`,
+      'bgColor': `${bgColor}`,
+      'feelings': `${feelings}`,
+      'privacy': `${privacy}`,
+      'gifUrl': `${gifUrl}`,
+      'profilePicture': `${profilePicture}`,
+      'imgVersion': `${imgVersion}`,
+      'imgId': `${imgId}`
+    };
     try {
       if(!this.client.isOpen) {
         await this.client.connect();
       };
-      await this.client.HSET(`posts:${key}`, dataToSave);
+
+      for (const [itemKey, itemValue] of Object.entries(dataToSave)) {
+        await this.client.HSET(`posts:${key}`, `${itemKey}`, `${itemValue}`);
+      };
+
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       multi.HGETALL(`posts:${key}`);
       const reply: PostCacheMultiType = await multi.exec() as PostCacheMultiType;

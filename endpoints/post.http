@@ -47,3 +47,13 @@ GET {{baseUrl}}/{{urlPath}}/post/images/1
 Accept: application/json,
 withCredentials: true
 
+###
+PUT {{baseUrl}}/{{urlPath}}/post/:postId
+# Content-Type: application/json
+Accept: application/json,
+withCredentials: true
+
+{
+
+}
+
