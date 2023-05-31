@@ -113,6 +113,7 @@
       "@auth/*": ["src/features/auth/*"],
       "@user/*": ["src/features/user/*"],
       "@post/*": ["src/features/post/*"],
+      "@reaction/*": ["src/features/reactions/*"],
       "@root/*": ["src/*"],
     }
   }
