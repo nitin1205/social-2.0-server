@@ -8,9 +8,9 @@ import { IUserDocument } from '@user/interfaces/user.interface';
 const userCache: UserCache = new UserCache();
 
 class ReactionService {
-  public async addReactionDataToDb(reactionData: IReactionJob): Promise<void> {
+  public async addReactionDataToDB(reactionData: IReactionJob): Promise<void> {
     const { postId, userTo, userFrom, username, type, previousReaction, reactionObject } = reactionData;
-    const updatedReaction: [IUserDocument, IReactionDocument, IPostDocument] = await Promise.all([
+    const updatedReaction: [IUserDocument, IReactionDocument, IPostDocument] = (await Promise.all([
       userCache.getUserFromCache(`${userTo}`),
       ReactionModel.replaceOne({ postId, type: previousReaction, username }, reactionObject, { upsert: true }),
       PostModel.findOneAndUpdate(
@@ -23,8 +23,28 @@ class ReactionService {
         },
         { new: true }
       )
-    ]) as [IUserDocument, IReactionDocument, IPostDocument];
-  }
+    ])) as unknown as [IUserDocument, IReactionDocument, IPostDocument];
+
+  };
+
+  public async removeReactionDataFromDB(reactionData: IReactionJob): Promise<void> {
+    const { postId, previousReaction, username } = reactionData;
+    await Promise.all([
+      ReactionModel.deleteOne({ postId, type: previousReaction, username }),
+      PostModel.updateOne(
+        { _id: postId },
+        {
+          $inc: {
+            [`reactions.${previousReaction}`]: -1
+          }
+        },
+        { new: true }
+      )
+
+    ]);
+  };
+
+
 };
 
-export const rectionService: ReactionService = new ReactionService();
+export const reactionService: ReactionService = new ReactionService();
