@@ -1,3 +1,5 @@
+import { omit } from 'lodash';
+
 import { IPostDocument } from '@post/interfaces/post.interface';
 import { PostModel } from '@post/models/post.schema';
 import { IReactionDocument, IReactionJob } from '@reaction/interfaces/reaction.interface';
@@ -10,9 +12,13 @@ const userCache: UserCache = new UserCache();
 class ReactionService {
   public async addReactionDataToDB(reactionData: IReactionJob): Promise<void> {
     const { postId, userTo, userFrom, username, type, previousReaction, reactionObject } = reactionData;
+    let updatedReactionObject: IReactionDocument = reactionObject as IReactionDocument;
+    if (previousReaction) {
+      updatedReactionObject = omit(reactionObject, ['_id']);
+    };
     const updatedReaction: [IUserDocument, IReactionDocument, IPostDocument] = (await Promise.all([
       userCache.getUserFromCache(`${userTo}`),
-      ReactionModel.replaceOne({ postId, type: previousReaction, username }, reactionObject, { upsert: true }),
+      ReactionModel.replaceOne({ postId, type: previousReaction, username }, updatedReactionObject, { upsert: true }),
       PostModel.findOneAndUpdate(
         { _id: postId },
         {
