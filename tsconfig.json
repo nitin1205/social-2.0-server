@@ -114,6 +114,7 @@
       "@user/*": ["src/features/user/*"],
       "@post/*": ["src/features/post/*"],
       "@reaction/*": ["src/features/reactions/*"],
+      "@comment/*": ["src/features/comments/*"],
       "@root/*": ["src/*"],
     }
   }
