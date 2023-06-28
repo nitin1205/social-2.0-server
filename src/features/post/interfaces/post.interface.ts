@@ -51,3 +51,5 @@ export interface IQueryComplete {
 export interface IQueryDeleted {
   deletedCount?: number;
 }
+
+export { IReactions };

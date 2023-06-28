@@ -32,7 +32,7 @@ export class CommentCache extends BaseCache {
     };
   };
 
-  public async getPostCommentFromCache(postId: string): Promise<ICommentDocument[]> {
+  public async getPostCommentsFromCache(postId: string): Promise<ICommentDocument[]> {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
