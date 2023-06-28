@@ -5,7 +5,7 @@ import HTTP_STATUS from 'http-status-codes';
 import { addCommentSchema } from '@comment/schemes/comment';
 import { joiValidation } from '@global/decorators/joi-validation-decorators';
 import { ICommentDocument, ICommentJob } from '@comment/interfaces/comment.interface';
-import { CommentCache } from '@service/queues/comment.cache';
+import { CommentCache } from '@service/redis/comment.cache';
 import { commentQueue } from '@service/queues/comment.queue';
 
 const commentCache: CommentCache = new CommentCache();
