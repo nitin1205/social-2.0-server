@@ -10,12 +10,14 @@ import { IEmailJob } from '@user/interfaces/user.interface';
 import { IPostJobData } from '@post/interfaces/post.interface';
 import { IReactionJob } from '@reaction/interfaces/reaction.interface';
 import { ICommentJob } from '@comment/interfaces/comment.interface';
+import { IFollowerJobData } from '@follower/interfaces/follower.interface';
 
 type IBaseJobData = IEmailJob
  | IAuthJob
  | IPostJobData
  | IReactionJob
- | ICommentJob;
+ | ICommentJob
+ | IFollowerJobData;
 
 
 let bullAdapters: BullAdapter[] = [];
