@@ -14,7 +14,7 @@ const followerCache: FollowerCache = new FollowerCache();
 const userCache: UserCache = new UserCache();
 
 export class AddFollower {
-  public async follower(req: Request, res: Response): Promise<void> {
+  public async follow(req: Request, res: Response): Promise<void> {
     const { followerId } = req.params;
     // update count in cache
     const followersCount: Promise<void> = followerCache.updateFollowersCountInCache(`${followerId}`, 'followersCount', 1);
