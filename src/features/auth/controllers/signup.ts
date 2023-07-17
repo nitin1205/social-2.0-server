@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { Request, Response } from 'express';
 import { UploadApiResponse } from 'cloudinary';
 import HTTP_STATUS from 'http-status-codes';
-import { omit } from 'lodash';
+// import { omit } from 'lodash';
 import JWT from 'jsonwebtoken';
 
 import { joiValidation } from '@global/decorators/joi-validation-decorators';
@@ -51,8 +51,8 @@ export class Signup {
     await userCache.saveUserToCache(`${userObjectId}`, uId, userDataForCache);
 
     // saving user information in DB
-    omit(userDataForCache, ['uId', 'username', 'email', 'avatarColor', 'password']);
-    authQueue.addAuthUserJob('addAuthUserToDB', { value: userDataForCache });
+    // omit(userDataForCache, ['uId', 'username', 'email', 'avatarColor', 'password']);
+    authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
     userQueue.addUserJob('addUserToDb', { value: userDataForCache });
 
     const userJwt: string = Signup.prototype.signToken(authData, userObjectId);
