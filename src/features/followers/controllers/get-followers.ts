@@ -23,5 +23,4 @@ export class GetFollower {
     res.status(HTTP_STATUS.OK).json({ message: 'User following', followers });
   };
 
-
 };
