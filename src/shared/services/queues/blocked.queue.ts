@@ -2,15 +2,16 @@ import { IBlockedUserJobData } from '@follower/interfaces/follower.interface';
 import { blockedUserWorker } from '@worker/blocked.worker';
 import { BaseQueue } from '@service/queues/base.queue';
 
-class BlockQueue extends BaseQueue {
+class BlockedUserQueue extends BaseQueue {
   constructor() {
-    super('block');
+    super('blockedUsers');
     this.processJob('addBlockedUserToDB', 5, blockedUserWorker.addBlockedUserToDB);
+    this.processJob('removeBlockedUserFromDB', 5, blockedUserWorker.addBlockedUserToDB);
   };
 
-  public addBkockUserJob(name: string, data: IBlockedUserJobData): void {
+  public addBlockUserJob(name: string, data: IBlockedUserJobData): void {
     this.addJob(name, data);
   };
 };
 
-export const blockQueue: BlockQueue = new BlockQueue();
+export const blockedUserQueue: BlockedUserQueue = new BlockedUserQueue();
