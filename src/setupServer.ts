@@ -124,6 +124,7 @@ export class SocialServer {
       const followerSocketHandler: SocketIOFollowerHandler = new SocketIOFollowerHandler(io);
       const userSocketHandler: SocketIOUserHandler = new SocketIOUserHandler(io);
 
+      userSocketHandler.listen();
       followerSocketHandler.listen();
       postSocketHandler.listen();
     };
