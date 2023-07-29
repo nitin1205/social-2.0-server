@@ -18,6 +18,7 @@ import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
 import { SocketIOPostHandler } from '@socket/post';
 import { SocketIOFollowerHandler } from '@socket/follower';
 import { SocketIOUserHandler } from '@socket/uers';
+import { SocketIONotificationHandler } from '@socket/notifications';
 
 const PORT = 5001;
 const log: Logger = config.createLogger('SetupServer');
@@ -123,10 +124,12 @@ export class SocialServer {
       const postSocketHandler: SocketIOPostHandler = new SocketIOPostHandler(io);
       const followerSocketHandler: SocketIOFollowerHandler = new SocketIOFollowerHandler(io);
       const userSocketHandler: SocketIOUserHandler = new SocketIOUserHandler(io);
+      const notificationSocketHandler: SocketIONotificationHandler = new SocketIONotificationHandler();
 
       userSocketHandler.listen();
       followerSocketHandler.listen();
       postSocketHandler.listen();
+      notificationSocketHandler.listen(io);
     };
 };
 
