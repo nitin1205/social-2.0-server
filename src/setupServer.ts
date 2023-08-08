@@ -19,6 +19,7 @@ import { SocketIOPostHandler } from '@socket/post';
 import { SocketIOFollowerHandler } from '@socket/follower';
 import { SocketIOUserHandler } from '@socket/uers';
 import { SocketIONotificationHandler } from '@socket/notifications';
+import { SocketIOImageHandler } from '@socket/image';
 
 const PORT = 5001;
 const log: Logger = config.createLogger('SetupServer');
@@ -125,11 +126,14 @@ export class SocialServer {
       const followerSocketHandler: SocketIOFollowerHandler = new SocketIOFollowerHandler(io);
       const userSocketHandler: SocketIOUserHandler = new SocketIOUserHandler(io);
       const notificationSocketHandler: SocketIONotificationHandler = new SocketIONotificationHandler();
+      const imageSocketHandler: SocketIOImageHandler = new SocketIOImageHandler();
 
       userSocketHandler.listen();
       followerSocketHandler.listen();
       postSocketHandler.listen();
       notificationSocketHandler.listen(io);
+      imageSocketHandler.listen(io);
+
     };
 };
 
