@@ -20,6 +20,7 @@ import { SocketIOFollowerHandler } from '@socket/follower';
 import { SocketIOUserHandler } from '@socket/uers';
 import { SocketIONotificationHandler } from '@socket/notifications';
 import { SocketIOImageHandler } from '@socket/image';
+import { SocketIOChatHandler } from '@socket/chat';
 
 const PORT = 5001;
 const log: Logger = config.createLogger('SetupServer');
@@ -127,12 +128,14 @@ export class SocialServer {
       const userSocketHandler: SocketIOUserHandler = new SocketIOUserHandler(io);
       const notificationSocketHandler: SocketIONotificationHandler = new SocketIONotificationHandler();
       const imageSocketHandler: SocketIOImageHandler = new SocketIOImageHandler();
+      const chatSocketHandler: SocketIOChatHandler = new SocketIOChatHandler(io);
 
       userSocketHandler.listen();
       followerSocketHandler.listen();
       postSocketHandler.listen();
       notificationSocketHandler.listen(io);
       imageSocketHandler.listen(io);
+      chatSocketHandler.listen();
 
     };
 };
