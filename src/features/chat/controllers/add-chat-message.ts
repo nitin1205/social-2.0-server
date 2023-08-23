@@ -11,12 +11,13 @@ import { UploadApiResponse } from 'cloudinary';
 import { uploads } from '@global/helpers/cloudinary-upload';
 import { BadRequestError } from '@global/helpers/error-handler';
 import { config } from '@root/config';
-import { IMessageData, IMessageNotification } from '@chat/interfaces/chat.interface';
+import { IChatJobData, IMessageData, IMessageNotification } from '@chat/interfaces/chat.interface';
 import { socketIOChatObject } from '@socket/chat';
 import { INotificationTemplate } from '@notification/interfaces/notification.interface';
 import { notificationTemplate } from '@service/emails/templates/notifications/notification-template';
 import { emailQueue } from '@service/queues/email.queue';
 import { MessageCache } from '@service/redis/message.cache';
+import { chatQueue } from '@service/queues/chat.queue';
 
 const userCache: UserCache = new UserCache();
 const messageCache: MessageCache = new MessageCache();
@@ -50,7 +51,7 @@ export class AddChat {
       fileUrl = `https://res.cloudinary.com/${config.CLOUD_NAME}/image/upload/v${result.version}/${result.public_id}`;
     };
 
-      const messageData: IMessageData = {
+      const messageData: IMessageData | IChatJobData = {
         _id: `${messageObjectId}`,
         conversationId: new mongoose.Types.ObjectId(conversationObjectId),
         receiverId,
@@ -86,10 +87,7 @@ export class AddChat {
       await messageCache.addChatListToCache(`${req.currentUser!.userId}`, `${receiverId}`, `${conversationObjectId}`);
       await messageCache.addChatListToCache(`${receiverId}`, `${req.currentUser!.userId}`, `${conversationObjectId}`);
       await messageCache.addChatMessageToCache(`${conversationObjectId}`, messageData);
-      // add sender to chat list
-      //  add receiver to chat list,
-      // add messageData to chache
-      // add message to chat queue
+      chatQueue.addChatJob('addChatMessageToDB', messageData);
 
       res.status(HTTP_STATUS.OK).json({ message: 'Message added', conversationId: conversationObjectId });
   };
