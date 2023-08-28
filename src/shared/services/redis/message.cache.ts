@@ -1,5 +1,5 @@
 import Logger from 'bunyan';
-import { findIndex } from 'lodash';
+import { find, findIndex } from 'lodash';
 
 import { config } from '@root/config';
 import { BaseCache } from './base.cache';
@@ -105,6 +105,32 @@ export class MessageCache extends BaseCache {
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error.Try again.');
+    };
+  };
+
+
+  public async getChatMessagesFromCache(senderId: string, receiverId: string): Promise<IMessageData[]> {
+    try {
+      if(!this.client.isOpen) {
+        await this.client.connect();
+      };
+      const userChatList: string[] = await this.client.LRANGE(`chatList:${senderId}`,0, -1);
+      const receiver: string = find(userChatList, (listItem: string) => listItem.includes(receiverId)) as string;
+      const parsedReceiver: IChatList = Helpers.parseJson(receiver) as IChatList;
+      if(parsedReceiver) {
+        const userMessage: string[] = await this.client.LRANGE(`messages:${parsedReceiver.conversationId}`, 0 ,-1);
+        const chatMessages: IMessageData[] = [];
+        for(const item of userMessage) {
+          const chatItem = Helpers.parseJson(item) as IMessageData;
+          chatMessages.push(chatItem);
+        };
+        return chatMessages;
+      } else {
+        return [];
+      };
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again');
     };
   };
 
