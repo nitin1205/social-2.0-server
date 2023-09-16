@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
-
-import { IUserDocument } from '@user/interfaces/user.interface';
-import { UserModel } from '@user/models/user.schema';
-import { followerService } from './follower.service';
 import { indexOf } from 'lodash';
+
+import { ISearchUser, IUserDocument } from '@user/interfaces/user.interface';
+import { UserModel } from '@user/models/user.schema';
+import { followerService } from '@service/db/follower.service';
+import { AuthModel } from '@auth/models/auth.schema';
 
 class UserService {
   public async addUserData(data: IUserDocument): Promise<void> {
@@ -79,6 +80,24 @@ class UserService {
   public async getTotalUsersInDB(): Promise<number> {
     const totalCount: number = await UserModel.find({}).countDocuments();
     return totalCount;
+  };
+
+  public async searchUsers(regex: RegExp): Promise<ISearchUser[]> {
+    const users = await AuthModel.aggregate([
+      { $match: { username: regex } },
+      { $lookup: { from: 'User', localField: '_id', foreignField: 'authId', as: 'is' } },
+      { $unwind: '$user' },
+      {
+        $project: {
+          _id: '$user._id',
+          username: 1,
+          email: 1,
+          avatarColor: 1,
+          profilePicture: 1
+        }
+      }
+    ]);
+    return users;
   };
 
   private aggregateProject() {
