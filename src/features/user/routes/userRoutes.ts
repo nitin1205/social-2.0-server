@@ -3,6 +3,8 @@ import express, { Router } from 'express';
 import { authMiddleware } from '@global/helpers/auth-middleware';
 import { GetProfile } from '@user/controllers/get-profile';
 import { SerchUser } from '@user/controllers/search-user';
+import { UpdatePassword } from '@user/controllers/change-password';
+import { UpdateInfo } from '@user/controllers/update-basic-info';
 
 
 
@@ -20,6 +22,10 @@ class UserRoutes {
     this.router.get('/user/profile/posts/:username/:userId/:uId', authMiddleware.checkAuthentication, GetProfile.prototype.profileAndPosts);
     this.router.get('/user/profile/user/suggestions', authMiddleware.checkAuthentication, GetProfile.prototype.randomUserSuggestions);
     this.router.get('/user/profile/search/:query', authMiddleware.checkAuthentication, SerchUser.prototype.user);
+
+    this.router.put('/user/profile/change-password', authMiddleware.checkAuthentication, UpdatePassword.prototype.password);
+    this.router.put('/user/profile/basic-info', authMiddleware.checkAuthentication, UpdateInfo.prototype.info);
+    this.router.put('/user/profile/social-links', authMiddleware.checkAuthentication, UpdateInfo.prototype.social);
 
     return this.router;
   };
