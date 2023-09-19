@@ -5,6 +5,7 @@ import { GetProfile } from '@user/controllers/get-profile';
 import { SerchUser } from '@user/controllers/search-user';
 import { UpdatePassword } from '@user/controllers/change-password';
 import { UpdateInfo } from '@user/controllers/update-basic-info';
+import { Setting } from '@user/controllers/update-setting';
 
 
 
@@ -26,6 +27,7 @@ class UserRoutes {
     this.router.put('/user/profile/change-password', authMiddleware.checkAuthentication, UpdatePassword.prototype.password);
     this.router.put('/user/profile/basic-info', authMiddleware.checkAuthentication, UpdateInfo.prototype.info);
     this.router.put('/user/profile/social-links', authMiddleware.checkAuthentication, UpdateInfo.prototype.social);
+    this.router.put('/user/profile/settings', authMiddleware.checkAuthentication, Setting.prototype.updateNotificationSetting);
 
     return this.router;
   };
