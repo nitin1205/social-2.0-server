@@ -29,7 +29,7 @@ export class UpdatePassword {
       throw new BadRequestError('Invalid Password');
     }
     const hashedPassword: string = await existingUser.hashPassword(newPassword);
-    userService.updatePassword(`${req.currentUser!.userId}`, hashedPassword);
+    userService.updatePassword(`${req.currentUser!.username}`, hashedPassword);
 
     const templateParams: IResetPasswordParams = {
       username: existingUser.username!,
