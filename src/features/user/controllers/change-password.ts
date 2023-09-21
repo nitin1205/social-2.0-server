@@ -8,10 +8,10 @@ import { changePasswordSchema } from '@user/schemes/info';
 import { BadRequestError } from '@global/helpers/error-handler';
 import { authService } from '@service/db/auth.service';
 import { IAuthDocument } from '@auth/interfaces/auth.interface';
-import { userService } from '@service/db/user.service';
 import { IResetPasswordParams } from '@user/interfaces/user.interface';
 import { resetPasswordTemplate } from '@service/emails/templates/reset-password/reset-password-template';
 import { emailQueue } from '@service/queues/email.queue';
+import { userService } from '@service/db/user.service';
 
 
 export class UpdatePassword {
@@ -29,7 +29,7 @@ export class UpdatePassword {
       throw new BadRequestError('Invalid Password');
     }
     const hashedPassword: string = await existingUser.hashPassword(newPassword);
-    userService.updatePassword(`${req.currentUser!.userId}`, hashedPassword);
+    userService.updatePassword(`${req.currentUser!.username}`, hashedPassword);
 
     const templateParams: IResetPasswordParams = {
       username: existingUser.username!,
