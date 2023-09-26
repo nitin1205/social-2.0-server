@@ -1,7 +1,6 @@
-import { IReactions } from '@reaction/interfaces/reaction.interface';
+import { IReactions } from '@root/features/reactions/interfaces/reaction.interface';
 import { ObjectId } from 'mongodb';
 import mongoose, { Document } from 'mongoose';
-
 
 export interface IPostDocument extends Document {
   _id?: string | mongoose.Types.ObjectId;
@@ -15,6 +14,8 @@ export interface IPostDocument extends Document {
   commentsCount: number;
   imgVersion?: string;
   imgId?: string;
+  videoId?: string;
+  videoVersion?: string;
   feelings?: string;
   gifUrl?: string;
   privacy?: string;
@@ -27,6 +28,7 @@ export interface IGetPostsQuery {
   username?: string;
   imgId?: string;
   gifUrl?: string;
+  videoId?: string;
 }
 
 export interface ISavePostToCache {
@@ -51,5 +53,3 @@ export interface IQueryComplete {
 export interface IQueryDeleted {
   deletedCount?: number;
 }
-
-export { IReactions };
