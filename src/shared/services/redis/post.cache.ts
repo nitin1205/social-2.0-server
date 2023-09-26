@@ -6,7 +6,8 @@ import { config } from '@root/config';
 import { ServerError } from '@global/helpers/error-handler';
 // import { Helpers } from '@global/helpers/helpers';
 // import { IUserDocument } from '@user/interfaces/user.interface';
-import { IPostDocument, IReactions, ISavePostToCache } from '@post/interfaces/post.interface';
+import { IPostDocument, ISavePostToCache } from '@post/interfaces/post.interface';
+import { IReactions } from '@reaction/interfaces/reaction.interface';
 import { Helpers } from '@global/helpers/helpers';
 
 const log: Logger = config.createLogger('postCache');
@@ -35,6 +36,8 @@ export class PostCache extends BaseCache {
       commentsCount,
       imgVersion,
       imgId,
+      videoId,
+      videoVersion,
       reactions,
       createdAt
     } = createdPost;
@@ -55,6 +58,8 @@ export class PostCache extends BaseCache {
       'reactions': JSON.stringify(reactions),
       'imgVersion': `${imgVersion}`,
       'imgId': `${imgId}`,
+      'videoVersion': `${videoVersion}`,
+      'videoId': `${videoId}`,
       'createdAt': `${createdAt}`
     };
 
@@ -128,6 +133,35 @@ export class PostCache extends BaseCache {
         };
       };
       return postWithImages;
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again');
+    };
+  };
+
+  public async getPostWithVideosFromCache(key: string, start: number, end: number): Promise<IPostDocument[]> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      };
+
+      const reply: string[] = await this.client.ZRANGE(key, start, end, { REV: true });
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      for (const value of reply) {
+        multi.HGETALL(`posts:${value}`);
+      };
+
+      const replies: PostCacheMultiType = await multi.exec() as PostCacheMultiType;
+      const postWithVideos: IPostDocument[] = [];
+      for (const post of replies as IPostDocument[]) {
+        if(post.videoId && post.videoVersion) {
+          post.commentsCount = Helpers.parseJson(`${post.commentsCount}`) as number;
+          post.reactions = Helpers.parseJson(`${post.reactions}`) as IReactions;
+          post.createdAt = new Date(Helpers.parseJson(`${post.createdAt}`)) as Date;
+          postWithVideos.push(post);
+        };
+      };
+      return postWithVideos;
     } catch(error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
@@ -210,7 +244,7 @@ export class PostCache extends BaseCache {
   };
 
   public async updatePostInCache(key: string, updatedPost: IPostDocument): Promise<IPostDocument> {
-    const { post, bgColor, feelings, privacy, gifUrl, imgVersion, imgId, profilePicture } = updatedPost;
+    const { post, bgColor, feelings, privacy, gifUrl, imgVersion, imgId, profilePicture, videoId, videoVersion } = updatedPost;
 
     const dataToSave = {
       'post': `${post}`,
@@ -220,7 +254,9 @@ export class PostCache extends BaseCache {
       'gifUrl': `${gifUrl}`,
       'profilePicture': `${profilePicture}`,
       'imgVersion': `${imgVersion}`,
-      'imgId': `${imgId}`
+      'imgId': `${imgId}`,
+      'videoId': `${videoId}`,
+      'videoVersion': `${videoVersion}`
     };
     try {
       if(!this.client.isOpen) {
