@@ -1,7 +1,6 @@
-import { IReactions } from '@reaction/interfaces/reaction.interface';
+import { IReactions } from '@root/features/reactions/interfaces/reaction.interface';
 import { ObjectId } from 'mongodb';
 import mongoose, { Document } from 'mongoose';
-
 
 export interface IPostDocument extends Document {
   _id?: string | mongoose.Types.ObjectId;
@@ -51,5 +50,3 @@ export interface IQueryComplete {
 export interface IQueryDeleted {
   deletedCount?: number;
 }
-
-export { IReactions };
