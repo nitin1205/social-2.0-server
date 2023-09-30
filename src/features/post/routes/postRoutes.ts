@@ -16,12 +16,15 @@ class PostRoutes{
   public routes(): Router {
     this.router.get('/post/all/:page', authMiddleware.checkAuthentication, GetPost.prototype.posts);
     this.router.get('/post/images/:page', authMiddleware.checkAuthentication, GetPost.prototype.postsWithImages);
+    this.router.get('/post/videos/:page', authMiddleware.checkAuthentication, GetPost.prototype.postsWithVideos);
 
     this.router.post('/post', authMiddleware.checkAuthentication, CreatePost.prototype.post);
     this.router.post('/post/image', authMiddleware.checkAuthentication, CreatePost.prototype.postWithImage);
+    this.router.post('/post/video', authMiddleware.checkAuthentication, CreatePost.prototype.postWithVideo);
 
     this.router.put('/post:postId', authMiddleware.checkAuthentication, UpdatePost.prototype.update);
     this.router.put('/post/image/:postId', authMiddleware.checkAuthentication, UpdatePost.prototype.postWithImage);
+    this.router.put('/post/video/:postId', authMiddleware.checkAuthentication, UpdatePost.prototype.postWithVideo);
 
     this.router.delete('/post/:postId', authMiddleware.checkAuthentication, DeletePost.prototype.post);
 
